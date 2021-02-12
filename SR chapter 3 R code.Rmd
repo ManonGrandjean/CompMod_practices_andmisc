@@ -1,0 +1,97 @@
+---
+title: "SR chapter 3 R code"
+author: "Manon Grandjean"
+date: "2/10/2021"
+output: html_document
+---
+## Detecting vampirism
+```{r R code 3.1}
+Pr_Positive_Vampire <- 0.95
+Pr_Positive_Mortal <- 0.01
+Pr_Vampire <- 0.001
+Pr_Positive <- Pr_Positive_Vampire * Pr_Vampire +
+               Pr_Positive_Mortal * ( 1 - Pr_Vampire )
+( Pr_Vampire_Positive <- Pr_Positive_Vampire*Pr_Vampire / Pr_Positive )
+```
+
+## Globe tossing
+Remember, the posterior here means the probability of p conditional on the data.
+```{r R code 3.2}
+p_grid <- seq( from=0 , to=1 , length.out=1000 )
+prob_p <- rep( 1 , 1000 )
+prob_data <- dbinom( 6 , size=9 , prob=p_grid )
+posterior <- prob_data * prob_p
+posterior <- posterior / sum(posterior)
+```
+
+```{r R code 3.3}
+samples <- sample( p_grid , prob=posterior , size=1e4 , replace=TRUE )
+```
+*The workhorse here is sample, which randomly pulls values from a vector. The vector in this case is p_grid, the grid of parameter values. The probability of each value is given by posterior, which you computed just above.*
+
+```{r R code 3.4}
+plot( samples )
+```
+*In this plot, it’s as if you are flying over the posterior distribution, looking down on it. There are many more samples from the dense region near 0.6 and very few samples below 0.25. On the right, the plot shows the density estimate computed from these samples.*
+
+```{r R code 3.5}
+library(rethinking)
+dens( samples )
+```
+*All you’ve done so far is crudely replicate the posterior density you had already com- puted. That isn’t of much value. But next it is time to use these samples to describe and understand the posterior. That is of great value.*
+
+### 3.2.1 intervals of defined boundaries
+```{r R code 3.6}
+# add up posterior probability where p < 0.5
+sum( posterior[ p_grid < 0.5 ] )
+```
+
+```{r R code 3.7}
+sum( samples < 0.5 ) / 1e4
+```
+*And that’s nearly the same answer as the grid approximation provided, although your answer will not be exactly the same, because the exact samples you drew from the posterior will be different.*
+
+```{r R code 3.8}
+sum( samples > 0.5 & samples < 0.75 ) / 1e4
+```
+
+# Practice
+```{r Easy}
+p_grid <- seq( from=0 , to=1 , length.out=1000 )
+prior <- rep( 1 , 1000 )
+likelihood <- dbinom( 6 , size=9 , prob=p_grid )
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+set.seed(100)
+samples <- sample( p_grid , prob=posterior , size=1e4 , replace=TRUE )
+```
+
+```{r E1. How much posterior probability lies below p = 0.2?}
+quantile(samples, 0.2)
+```
+
+```{r E2. How much posterior probability lies above p = 0.8?}
+quantile(samples, c(0.8, 1.0))
+```
+
+```{r E3. How much posterior probability lies between p = 0.2 and p = 0.8?}
+quantile(samples, c(0.2, 0.8))
+# middle 60% lies between 20% boundary and 80% boundary
+```
+
+```{r 3E4. 20% of the posterior probability lies below which value of p?}
+
+```
+
+```{r E5. 20% of the posterior probability lies above which value of p?}
+
+```
+
+```{r E6. Which values of p contain the narrowest interval equal to 66% of the posterior probability?}
+
+```
+
+```{r E7. Which values of p contain 66% of the posterior probability, assuming equal posterior probability both below and above the interval?}
+
+```
+

@@ -1,0 +1,6 @@
+---
+title: "SR chapter 4 practices"
+author: "Manon Grandjean"
+date: "2/12/2021"
+output: html_document
+---
