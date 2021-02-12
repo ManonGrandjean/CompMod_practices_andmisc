@@ -31,17 +31,62 @@ $Pr(\mu, \sigma|y) = \frac{\prod_{i} Normal(y_{i}|\mu, \sigma)Normal(\mu|0, 10)E
   α ∼ Normal(0, 10) 
   β ∼ Normal(0, 1) 
   σ ∼ Exponential(2)
+*(see SR page 93)*
 
 4E5. In the model definition just above, how many parameters are in the posterior distribution? 
 *3? α, β, and σ*
 
 ### Medium
 4M1. For the model definition below, simulate observed y values from the prior (not the posterior).
-  yi ∼ Normal(μ, σ) 
-  μ ∼ Normal(0, 10) 
-  σ ∼ Exponential(1)
+    yi ∼ Normal(μ, σ) 
+    μ ∼ Normal(0, 10) 
+    σ ∼ Exponential(1)
+```{r 4M1}
+# see SR page 95 for prior predictive simulation
+N <- 100 #simulating 100 observations?
+mu <- rnorm(N, 0, 10) #parameter nr 1
+sigma <- rexp(N, 1) #parameter nr 2
+
+# loading in the data
+library(rethinking)
+data(Howell1); d <- Howell1; d2 <- d[ d$age >= 18 , ] #d2 is the data set with only adults
+#plot( d2$height ~ d2$weight )
+
+# plotting like in R code 4.39 from the book:
+plot( NULL , xlim=range(d2$weight) , ylim=c(-100,400) ,
+    xlab="weight" , ylab="height" )
+abline( h=0 , lty=2 )
+abline( h=272 , lty=1 , lwd=0.5 )
+mtext( "sigma ~ rexp(N, 1)" )
+xbar <- mean(d2$weight)
+for ( i in 1:N ) curve( mu[i] + sigma[i]*(x - xbar) ,
+    from=min(d2$weight) , to=max(d2$weight) , add=TRUE ,
+    col=col.alpha("black",0.2) )
+                                                            #Nååååååår mu antager en mean på 0! derfor er stregerne omkring 0!
+                                                            #Hvis man sætter den til det samme som eksemplet fra bogen kan man 
+                                                            #bedre sammenligne dem :)
+
+# exact copy of example from book:
+set.seed(2971)
+N <- 100                   # 100 lines
+a <- rnorm( N , 178 , 20 )
+b <- rnorm( N , 0 , 10 )
+
+plot( NULL , xlim=range(d2$weight) , ylim=c(-100,400) ,
+    xlab="weight" , ylab="height" )
+abline( h=0 , lty=2 )
+abline( h=272 , lty=1 , lwd=0.5 )
+mtext( "b ~ dnorm(0,10)" )                #hvorfor står der dnorm når den defineres med rnorm?
+xbar <- mean(d2$weight)
+for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
+    from=min(d2$weight) , to=max(d2$weight) , add=TRUE ,
+    col=col.alpha("black",0.2) )
+```
 
 4M2. Translate the model just above into a quap formula.
+  *yi ~ dnorm(mu, sigma),*
+  *mu ~ dnorm(0, 10),*
+  *sigma ~ dexp(1)*
 
 4M3. Translate the quap model formula below into a mathematical model definition.
     y ~ dnorm( mu , sigma ),
@@ -49,6 +94,11 @@ $Pr(\mu, \sigma|y) = \frac{\prod_{i} Normal(y_{i}|\mu, \sigma)Normal(\mu|0, 10)E
     a ~ dnorm( 0 , 10 ),
     b ~ dunif( 0 , 1 ),
     sigma ~ dexp( 1 )
+  *y ~ Normal(μ, σ)*
+  *μ ~ α + βx*
+  *α ~ Normal(0, 10)*
+  *β ~ Uniform(0, 1)*
+  *σ ~ Exponential(1)*
 
 4M4. A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.
 
