@@ -5,28 +5,35 @@ date: "2/12/2021"
 output: html_document
 ---
 
-#4.7. Practice
+# 4.7. Practice
 Problems are labeled Easy (E), Medium (M), and Hard (H).
+*My answers are marked in italics*
 
 ### Easy
 4E1. In the model definition below, which line is the likelihood? 
-  yi ∼ Normal(μ, σ)
+  *yi ∼ Normal(μ, σ)*
   μ ∼ Normal(0, 10) 
   σ ∼ Exponential(1)
+*- initial thinking: if mu is mean and sigma is standard deviation (SR 4.3) then yi could be likelihood given the two others?)*
+*- it is also stated on page 82 where instead of yi it is called hi*
 
 4E2. In the model definition just above, how many parameters are in the posterior distribution?
+*- 2? mu and sigma (see also page 82: "The parameters to be estimated are both μ and σ, so we need a prior Pr(μ, σ), the joint prior probability for all parameters.")*
 
 4E3. Using the model definition above, write down the appropriate form of Bayes’ theorem that includes the proper likelihood and priors.
+*(see SR page 84 for where i took it from and modified it)*
+*(for mathematical notation in R: https://rpruim.github.io/s341/S19/from-class/MathinRmd.html)*
+$Pr(\mu, \sigma|y) = \frac{\prod_{i} Normal(y_{i}|\mu, \sigma)Normal(\mu|0, 10)Exponential(\sigma|1)}{\int\int\prod_{i} Normal(y_{i}|\mu, \sigma)Normal(\mu|0, 10)Exponential(\sigma|1)d\mu d\sigma}$
 
 4E4. In the model definition below, which line is the linear model?
   yi ∼ Normal(μ, σ) 
-  μi =α+βxi
+  *μi =α+βxi*
   α ∼ Normal(0, 10) 
   β ∼ Normal(0, 1) 
   σ ∼ Exponential(2)
 
 4E5. In the model definition just above, how many parameters are in the posterior distribution? 
-
+*3? α, β, and σ*
 
 ### Medium
 4M1. For the model definition below, simulate observed y values from the prior (not the posterior).
