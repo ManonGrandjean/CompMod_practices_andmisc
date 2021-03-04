@@ -9,13 +9,17 @@ output: html_document
 Problems are labeled Easy (E), Medium (M), and Hard (H).
 
 5E1. Which of the linear models below are multiple linear regressions?
-(1) μi =α+βxi
-(2) μi = βxxi + βzzi
-(3) μi = α + β(xi − zi) (4) μi =α+βxxi +βzzi
+  (1) μi =α+βxi
+  (2) μi = βxxi + βzzi
+  (3) μi = α + β(xi − zi)
+  *(4) μi =α + βxXi + βzZi*
 
 5E2. Write down a multiple regression to evaluate the claim: Animal diversity is linearly related to latitude, but only after controlling for plant diversity. You just need to write down the model definition.
+*μi = α + βnNi + βmMi*
+*where μi is the *
 
 5E3. Write down a multiple regression to evaluate the claim: Neither amount of funding nor size of laboratory is by itself a good predictor of time to PhD degree; but together these variables are both positively associated with time to degree. Write down the model definition and indicate which side of zero each slope parameter should be on.
+*that is in interaction, right? beause neither alone is good, but when they are both considered together, they tell you something. Like how plants can't grow from either sun or water alone, but only together.* 
 
 5E4. Suppose you have a single categorical predictor with 4 levels (unique values), labeled A, B, C and D. Let Ai be an indicator variable that is 1 where case i is in category A. Also suppose Bi, Ci, and Di for the other categories. Now which of the following linear models are inferentially equivalent ways to include the categorical variable in a regression? Models are inferentially equivalent when it’s possible to compute one posterior distribution from the posterior distribution of another model.
 (1) μi = α+βAAi +βBBi +βDDi

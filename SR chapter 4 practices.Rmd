@@ -101,14 +101,41 @@ for ( i in 1:N ) curve( a[i] + b[i]*(x - xbar) ,
   *σ ~ Exponential(1)*
 
 4M4. A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.
+*- prior mu with some mean height depending on age of students, and a sd that may be rather large, again depending on the age of students.*
 
 4M5. Now suppose I remind you that every student got taller each year. Does this information lead you to change your choice of priors? How?
+*- perhaps a prior that somehow indicates that the development can only go up, IDK if that would be a uniform or exponential prior. Hmm really makes you think.*
 
 4M6. Now suppose I tell you that the variance among heights for students of the same age is never more than 64cm. How does this lead you to revise your priors?
 
 4M7. Refit model m4.3 from the chapter, but omit the mean weight xbar this time. Compare the new model’s posterior to that of the original model. In particular, look at the covariance among the parameters. What is different? Then compare the posterior predictions of both models.
 
 4M8. In the chapter, we used 15 knots with the cherry blossom spline. Increase the number of knots and observe what happens to the resulting spline. Then adjust also the width of the prior on the weights—change the standard deviation of the prior and watch what happens. What do you think the combination of knot number and the prior on the weights controls?
+```{r 4M8}
+# loading data
+library(rethinking)
+data(cherry_blossoms)
+d <- cherry_blossoms
+precis(d)
+
+d2 <- d[complete.cases(d$doy),] # complete cases on doy
+num_knots <- 100
+knot_list <- quantile(d2$year, probs = seq(0, 1, length.out = num_knots))         #er det her priors?
+
+library(splines)
+B <- bs(d2$year,
+    knots = knot_list[-c(1,num_knots)],
+    degree = 3, intercept = TRUE)
+
+plot(NULL, xlim = range(d2$year), ylim = c(0, 1), xlab = "year", ylab = "basis")
+for (i in 1:ncol(B)) lines(d2$year, B[,i])
+
+# RESULT
+# - it looks like the knots get closer and closer to each other toward the high end of the x axis. I don't know if this is a result of more knots or just the way it is. Maybe this is a result of more recent years having fewer NA's in data (notice how the first few wiggles become less smooth at 100 knots).
+# - where is the prior? and how do i change the width and sd of it?
+# - combination of knot number and the prior on the weights:
+```
+
 
 ### Hard
 4H1. The weights listed below were recorded in the !Kung census, but heights were not recorded for these individuals. Provide predicted heights and 89% intervals for each of these individuals. That is, fill in the table below, using model-based predictions.
