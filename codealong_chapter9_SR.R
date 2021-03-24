@@ -129,4 +129,120 @@ HMC2 <- function (U, grad_U, epsilon, L, current_q) {
   return(list( q=new_q, traj=qtraj, ptraj=ptraj, accept=accept ))
 }
 
-    
+
+
+
+
+# 9.4 Easy HMC: ulam
+library(rethinking)
+data(rugged)
+d <- rugged
+d$log_gdp <- log(d$rgdppc_2000)
+dd <- d[ complete.cases(d$rgdppc_2000) , ]
+dd$log_gdp_std <- dd$log_gdp / mean(dd$log_gdp)
+dd$rugged_std <- dd$rugged / max(dd$rugged)
+dd$cid <- ifelse( dd$cont_africa==1 , 1 , 2 )
+
+m8.3 <- quap(
+  alist(
+    log_gdp_std ~ dnorm( mu , sigma ) ,
+    mu <- a[cid] + b[cid]*( rugged_std - 0.215 ) ,
+    a[cid] ~ dnorm( 1 , 0.1 ) ,
+    b[cid] ~ dnorm( 0 , 0.3 ) ,
+    sigma ~ dexp( 1 )
+  ) , data=dd )
+precis( m8.3 , depth=2 )
+
+# 9.4.1 Preparation
+dat_slim <- list(
+  log_gdp_std = dd$log_gdp_std,
+  rugged_std = dd$rugged_std,
+  cid = as.integer( dd$cid )
+)
+str(dat_slim)
+
+# 9.4.2. Sampling from the posterior.
+library(rstan)
+m9.1 <- ulam(
+  alist(
+    log_gdp_std ~ dnorm( mu , sigma ) ,
+    mu <- a[cid] + b[cid]*( rugged_std - 0.215 ) ,
+    a[cid] ~ dnorm( 1 , 0.1 ) ,
+    b[cid] ~ dnorm( 0 , 0.3 ) ,
+    sigma ~ dexp( 1 )
+  ) , data=dat_slim , chains=1 )
+precis( m9.1 , depth=2 )
+
+# 9.4.3. Sampling again, in parallel.
+m9.1 <- ulam(
+  alist(
+    log_gdp_std ~ dnorm( mu , sigma ) ,
+    mu <- a[cid] + b[cid]*( rugged_std - 0.215 ) ,
+    a[cid] ~ dnorm( 1 , 0.1 ) ,
+    b[cid] ~ dnorm( 0 , 0.3 ) ,
+    sigma ~ dexp( 1 )
+  ) , data=dat_slim , chains=4 , cores=4 )
+show( m9.1 )
+precis( m9.1 , 2 )
+
+# 9.4.4. Visualization.
+pairs( m9.1 )
+
+# 9.4.5. Checking the chain.
+traceplot( m9.1 )
+trankplot( m9.1 )
+
+
+
+
+
+# 9.5.3. Taming a wild chain.
+y <- c(-1,1)
+set.seed(11)
+m9.2 <- ulam(
+  alist(
+    y ~ dnorm( mu , sigma ) ,
+    mu <- alpha ,
+    alpha ~ dnorm( 0 , 1000 ) ,
+    sigma ~ dexp( 0.0001 )
+  ) , data=list(y=y) , chains=3 )
+precis( m9.2 )
+
+set.seed(11)
+m9.3 <- ulam(
+  alist(
+    y ~ dnorm( mu , sigma ) ,
+    mu <- alpha ,
+    alpha ~ dnorm( 1 , 10 ) ,
+    sigma ~ dexp( 1 )
+  ) , data=list(y=y) , chains=3 )
+precis( m9.3 )
+
+
+
+
+
+# 9.5.4. Non-identifiable parameters.
+set.seed(41)
+y <- rnorm( 100 , mean=0 , sd=1 )
+
+set.seed(384)
+m9.4 <- ulam(
+  alist(
+    y ~ dnorm( mu , sigma ) ,
+    mu <- a1 + a2 ,
+    a1 ~ dnorm( 0 , 1000 ),
+    a2 ~ dnorm( 0 , 1000 ),
+    sigma ~ dexp( 1 )
+  ) , data=list(y=y) , chains=3 )
+precis( m9.4 )
+
+m9.5 <- ulam(
+  alist(
+    y ~ dnorm( mu , sigma ) ,
+    mu <- a1 + a2 ,
+    a1 ~ dnorm( 0 , 10 ),
+    a2 ~ dnorm( 0 , 10 ),
+    sigma ~ dexp( 1 )
+  ) , data=list(y=y) , chains=3 )
+precis( m9.5 )
